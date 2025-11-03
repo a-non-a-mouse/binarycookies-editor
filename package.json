@@ -1,0 +1,31 @@
+{
+  "name": "binarycookies",
+  "version": "0.0.1",
+  "description": "Library and tools for working with Apple's .binarycookies files",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "build": "rm -rf build && tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.6"
+  },
+  "exports": {
+    "./classes": "./build/classes/index.js",
+    "./utils": "./build/utils/index.js",
+    ".": "./build/index.js"
+  },
+  "bin": {
+    "filter-cookies": "./build/bin/filter-cookies.js",
+    "read-cookies": "./build/bin/read-cookies.js"
+  },
+  "imports": {
+    "#classes/*": "./src/classes/*/*.ts",
+    "#utils/*": "./src/utils/*/*.ts",
+    "#*": "./src/*/*.ts"
+  }
+}
