@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-import { CursorBuffer } from '#utils/cursor-buffer';
-
 import { Page } from '#classes/page';
+import { CursorBuffer } from '#utils/cursor-buffer';
+import { printEnd } from '#utils/print';
 
 /*
 | Field           | Endianness | Type                 | Size        | Description                             |
@@ -83,11 +83,19 @@ export class BinaryCookies {
     }
   }
 
-  filter(regex: RegExp): void {
+  filter(regexes: [string, RegExp][]): void {
     this.#canNotValidate = true;
 
     for (const page of this.#pages) {
-      page.filter(regex);
+      page.filter(regexes);
+    }
+  }
+
+  deleteCookies(regexes: [string, RegExp][]): void {
+    this.#canNotValidate = true;
+
+    for (const page of this.#pages) {
+      page.deleteCookies(regexes);
     }
   }
 
@@ -155,5 +163,7 @@ export class BinaryCookies {
     for (const page of this.#pages) {
       page.print();
     }
+
+    printEnd();
   }
 }

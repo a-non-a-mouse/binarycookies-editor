@@ -9,7 +9,7 @@ import { validateRegexps } from '#utils/validate-regexps';
 
 const args = parseArgs(process.argv.slice(2));
 
-const usage = `Usage: filter-cookies <file> [regex1] [regex2] ... (--output=output-file | --inplace)`;
+const usage = `Usage: delete-cookies <file> [regex1] [regex2] ... (--output=output-file | --inplace)`;
 let file = args._[0];
 const regExps = args._.slice(1);
 let outputFile: string | undefined;
@@ -39,7 +39,7 @@ const regexes = validateRegexps(regExps);
 const filePath = path.resolve(file) as string;
 const binaryCookies = new BinaryCookies(filePath, debug);
 binaryCookies.validateChecksum();
-binaryCookies.filter(regexes);
+binaryCookies.deleteCookies(regexes);
 binaryCookies.write(outputFile);
 
 let numCookies = binaryCookies.countCookies();

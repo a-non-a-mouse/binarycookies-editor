@@ -1,5 +1,6 @@
 import { CursorBuffer } from '#utils/cursor-buffer';
 import { appleDate } from '#utils/apple-date';
+import { print, getOptions } from '#utils/print';
 
 /*
 | Field              | Endianness | Type         | Size (offset) | Description                                                             |
@@ -61,8 +62,34 @@ export class Cookie {
     this.#metadata = cursorBuffer.readAll();
   }
 
-  get url(): string {
-    return this.#url;
+  test(regexes: [string, RegExp][]): boolean {
+    return regexes.some(([fieldName, regex]) => {
+      switch (fieldName) {
+        case 'url':
+          return regex.test(this.#url);
+        case 'name':
+          return regex.test(this.#name);
+        case 'path':
+          return regex.test(this.#path);
+        case 'value':
+          return regex.test(this.#value);
+        case 'comment':
+          return regex.test(this.#comment ?? '');
+        case 'commenturl':
+          return regex.test(this.#commentURL ?? '');
+        case '*':
+          return (
+            regex.test(this.#url) ||
+            regex.test(this.#name) ||
+            regex.test(this.#path) ||
+            regex.test(this.#value) ||
+            regex.test(this.#comment ?? '') ||
+            regex.test(this.#commentURL ?? '')
+          );
+        default:
+          return false;
+      }
+    });
   }
 
   serialize(): Buffer {
@@ -142,9 +169,11 @@ export class Cookie {
     const isSecure = !!(flags & 1);
     const isHTTPOnly = !!(flags & 4);
     const SameSite = ['Default', 'Lax', 'None', 'Strict'][(flags & 24) >> 3];
+    const { debug } = getOptions();
 
     const data = {
-      version: this.#version,
+      version: debug ? this.#version : undefined,
+      flags: debug ? this.#flags.toString(2) : undefined,
       isSecure,
       isHTTPOnly,
       SameSite,
@@ -157,9 +186,9 @@ export class Cookie {
       name: this.#name,
       path: this.#path,
       value: this.#value,
-      metadata: this.#metadata.toString('hex'),
+      metadata: debug ? this.#metadata.toString('hex') : undefined,
     };
 
-    console.log(JSON.stringify(data, null, 2));
+    print(data);
   }
 }

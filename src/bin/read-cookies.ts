@@ -1,32 +1,30 @@
 #!/usr/bin/env node
 
 import path from 'node:path';
-import { BinaryCookies } from '#classes/binarycookies';
 
-const file = process.argv[2];
-const rawRegex = process.argv[3];
+import parseArgs from 'minimist';
+
+import { BinaryCookies } from '#classes/binarycookies';
+import { validateRegexps } from '#utils/validate-regexps';
+
+const args = parseArgs(process.argv.slice(2));
+
+let file = args._[0];
+const regExps = args._.slice(1);
 
 if (!file) {
-  console.error('Usage: read-cookie-file <file>');
+  console.error('Usage: read-cookie-file <file> [regex1] [regex2] ...');
   process.exit(1);
+} else if (file.toLowerCase() === 'safari') {
+  file = `${process.env.HOME}/Library/Containers/com.apple.Safari/Data/Library/Cookies/Cookies.binarycookies`;
 }
 
-let regex: RegExp | undefined;
-
-if (rawRegex) {
-  try {
-    regex = new RegExp(rawRegex);
-  } catch (error) {
-    console.error('Invalid regex:', error);
-    process.exit(1);
-  }
-}
-
-const filePath = path.resolve(file) as string;
+const regexes = validateRegexps(regExps);
+const filePath = path.resolve(file);
 const binaryCookies = new BinaryCookies(filePath);
 
-if (regex) {
-  binaryCookies.filter(regex);
+if (regexes.length) {
+  binaryCookies.filter(regexes);
 }
 
 binaryCookies.print();

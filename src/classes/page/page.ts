@@ -34,8 +34,12 @@ export class Page {
     }
   }
 
-  filter(regex: RegExp): void {
-    this.#cookies = this.#cookies.filter((cookie) => regex.test(cookie.url));
+  filter(regexes: [string, RegExp][]): void {
+    this.#cookies = this.#cookies.filter((cookie) => cookie.test(regexes));
+  }
+
+  deleteCookies(regexes: [string, RegExp][]): void {
+    this.#cookies = this.#cookies.filter((cookie) => !cookie.test(regexes));
   }
 
   serialize(): Buffer {

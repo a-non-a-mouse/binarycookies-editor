@@ -11,53 +11,78 @@ npm run build
 
 ## Command Line Tools
 
-### read-cookies
+### Regular Expression Format
 
-Reads and displays cookies from a binarycookies file. Optionally filters cookies by a regular expression.
+Both command-line tools support an extended regex format that allows you to specify which cookie field to match against and optional regex flags:
 
-**Usage:**
+- `regexPattern` - Matches against all cookie data
+- `@fieldName regexPattern` - Matches against a specific cookie field
+- `@fieldName:i regexPattern` - Case insensitive search against a specific cookie field
+- `@*:i regexPattern` - Case insensitve search against all cookie data
 
-```bash
-npx read-cookies <file> [regex]
-```
-
-**Arguments:**
-
-- `file` - Path to the .binarycookies file (required)
-- `regex` - Optional regular expression to filter cookies by name
+Valid field names are: url, name, path, value, comment, commenturl
 
 **Examples:**
 
 ```bash
-# Read all cookies from a file
-npx read-cookies Cookies.binarycookies
+npx read-cookies Cookies.binarycookies example.com
+npx read-cookies Cookies.binarycookies "@url google"
+npx read-cookies Cookies.binarycookies "@url:i gOOgLe"
+npx read-cookies Cookies.binaryCookies "@url ^(.*\.)?(github\.com|google\.com|youtube\.com)$"
+```
 
-# Read only cookies matching a pattern
-npx read-cookies Cookies.binarycookies "^example"
+### Safari Cookies
+
+If you use the literal string "Safari" as a file path, it will read cookies from `~/Library/Containers/com.apple.Safari/Data/Library/Cookies/Cookies.binarycookies`
+
+### read-cookies
+
+Reads and displays cookies from a binarycookies file. Optionally filters cookies by one or more regular expressions.
+
+**Usage:**
+
+```bash
+npx read-cookies <file> [regex1] [regex2] ... [--format=table|json]
+```
+
+**Examples:**
+
+```bash
+npx read-cookies Safari
+npx read-cookies Safari google --format=json
+npx read-cookies /path/to/Cookies.binarycookies ^example "@url google\.com$"
 ```
 
 ### filter-cookies
 
-Filters cookies from a binarycookies file using a regular expression and writes the filtered results to a new file.
+Filters cookies in a binarycookies file to only those matching one or more regular expressions and writes the filtered results to a file
 
 **Usage:**
 
 ```bash
-npx filter-cookies <file> <regex> [output-file] [--debug]
+npx filter-cookies <file> [regex1] [regex2] ... (--output=output-file | --inplace)
 ```
-
-**Arguments:**
-
-- `file` - Path to the input .binarycookies file (required)
-- `regex` - Regular expression to filter cookies by name (required)
-- `output-file` - Optional path for the output file. If not provided, the input file is overwritten
 
 **Examples:**
 
 ```bash
-# Filter Safari's cookies and delete any not from google.com
-npx filter-cookies ~/Library/Containers/com.apple.Safari/Data/Library/Cookies/Cookies.binarycookies "google\.com$"
+npx filter-cookies Safari "google\.com$" --output=filtered.binarycookies
+npx filter-cookies /path/to/Cookies.binarycookies "google\.com$" --inplace
+```
 
-# Filter cookies and write to a specific file
-npx filter-cookies Cookies.binarycookies "google\.com" filtered-cookies.binarycookies
+### delete-cookies
+
+Deletes cookies in a binarycookies file that match one or more regular expressions and writes the filtered results to a file
+
+**Usage:**
+
+```bash
+npx delete-cookies <file> [regex1] [regex2] ... (--output=output-file | --inplace)
+```
+
+**Examples:**
+
+```bash
+npx delete-cookies Safari "google\.com$" --output=filtered.binarycookies
+npx delete-cookies /path/to/Cookies.binarycookies "google\.com$" --inplace
 ```
