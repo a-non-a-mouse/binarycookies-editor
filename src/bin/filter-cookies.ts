@@ -38,9 +38,11 @@ if (args.output) {
 const regexes = validateRegexps(regExps);
 const filePath = path.resolve(file) as string;
 const binaryCookies = new BinaryCookies(filePath, debug);
+const originalCookieCount = binaryCookies.countCookies();
 binaryCookies.validateChecksum();
 binaryCookies.filter(regexes);
 binaryCookies.write(outputFile);
 
 let numCookies = binaryCookies.countCookies();
+console.log(`Deleted ${originalCookieCount - numCookies} cookies`);
 console.log(`Wrote ${numCookies} cookies`);
